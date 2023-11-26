@@ -1,13 +1,18 @@
 import cors from "cors";
+import pkg from "express-ipfilter";
 import addRequest from "./database/AddRequest.js";
 import retrieveRequest from "./database/RetrieveRequest.js";
 import retrieveTicketStatus from "./database/RequestQuantity.js";
 import availableAPIrequest from "./database/AvailableAPI.js";
 import { POST, GET } from "./constants.js";
 import express from "express";
+import { errorHandler } from "./error.handler.js";
+const { IpFilter } = pkg;
 
 const port = process.env.PORT || 3000;
 const app = express();
+
+app.use(IpFilter([process.env.WHITELIST_IP], { mode: "allow" }));
 
 app.use(express.json());
 app.use(
@@ -81,6 +86,8 @@ app.get("/request/availableAPI", async (req, res) => {
     return res.status(500).send({ error: error });
   }
 });
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log("Listening on PORT:", port);
