@@ -1,11 +1,11 @@
 import cors from "cors";
-import pkg from "express-ipfilter";
-import addRequest from "./database/AddRequest.js";
-import retrieveRequest from "./database/RetrieveRequest.js";
-import retrieveTicketStatus from "./database/RequestQuantity.js";
-import availableAPIrequest from "./database/AvailableAPI.js";
-import { POST, GET } from "./constants.js";
 import express from "express";
+import pkg from "express-ipfilter";
+import { GET, POST } from "./constants.js";
+import addRequest from "./database/AddRequest.js";
+import availableAPIrequest from "./database/AvailableAPI.js";
+import retrieveTicketStatus from "./database/RequestQuantity.js";
+import retrieveRequest from "./database/RetrieveRequest.js";
 import { errorHandler } from "./error.handler.js";
 const { IpFilter } = pkg;
 
@@ -17,32 +17,40 @@ app.use(IpFilter([process.env.WHITELIST_IP], { mode: "allow" }));
 app.use(express.json());
 app.use(
   cors({
-    methods: POST, GET,
-  }),
+    methods: POST,
+    GET,
+  })
 );
 
-const validateRequest = (req, res, next) => {
-  console.log(req.body.user_id)
-  if (!req.body.user_id) {
-    return res.status(400).send({ error: "No text provided" });
+app.get("/", async (req, res) => {
+  try {
+    const user_id = req.query.user_id;
+    console.log(user_id);
+    const response = await retrieveRequest({ user_id: user_id });
+    return res.json(response);
+  } catch (error) {
+    console.error("Error in request route", error);
+    return res.status(500).send({ error: error });
   }
-  next();
-};
+});
 
-
-app.post("/request/insert", validateRequest, async (req, res) => {
+app.post("/insert", async (req, res) => {
   try {
     const createdAt = req.body.createdAt;
     const input = req.body.input;
     const output = req.body.output;
     const user_id = req.body.user_id;
 
-    const response = await addRequest({ input: input, output: output, user_id: user_id, createdAt: createdAt });
+    const response = await addRequest({
+      input: input,
+      output: output,
+      user_id: user_id,
+      createdAt: createdAt,
+    });
     if (response) {
-      res.json({ "Success": "Your request has been stored in our database" });
-
+      res.json({ Success: "Your request has been stored in our database" });
     } else {
-      res.json({ "Err": "Failed to add your request" });
+      res.json({ Err: "Failed to add your request" });
     }
     return;
   } catch (error) {
@@ -51,36 +59,22 @@ app.post("/request/insert", validateRequest, async (req, res) => {
   }
 });
 
-app.get("/request", async (req, res) => {
-  try {
-    const user_id = req.query.user_id;
-    console.log(user_id)
-    const response = await retrieveRequest({ user_id: user_id });
-    const responseData = JSON.stringify(response);
-    res.send(responseData)
-  } catch (error) {
-    console.error("Error in request route", error);
-    return res.status(500).send({ error: error });
-  }
-});
-
-
-app.get("/request/ticketStatus", async (req, res) => {
+app.get("/ticketStatus", async (req, res) => {
   try {
     const user_id = req.query.user_id;
     const response = await retrieveTicketStatus({ user_id: user_id });
-    res.send(response)
+    return res.json(response);
   } catch (error) {
     console.error("Error in request route", error);
     return res.status(500).send({ error: error });
   }
 });
 
-app.get("/request/availableAPI", async (req, res) => {
+app.get("/availableAPI", async (req, res) => {
   try {
     const user_id = req.query.user_id;
     const response = await availableAPIrequest({ user_id: user_id });
-    res.send(response)
+    return res.json(response);
   } catch (error) {
     console.error("Error in availableAPI route", error);
     return res.status(500).send({ error: error });
