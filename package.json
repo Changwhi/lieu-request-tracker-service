@@ -1,0 +1,24 @@
+{
+  "type": "module",
+  "name": "project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --env-file .env index.js",
+    "watch": "nodemon --env-file .env index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ee-first": "^1.1.1",
+    "express": "^4.18.2",
+    "mysql2": "^3.6.5"
+  }
+}
