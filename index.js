@@ -6,6 +6,7 @@ import addRequest from "./database/AddRequest.js";
 import availableAPIrequest from "./database/AvailableAPI.js";
 import retrieveTicketStatus from "./database/RequestQuantity.js";
 import retrieveRequest from "./database/RetrieveRequest.js";
+import { createRequestManager } from "./database/createRequestManager.js";
 import { errorHandler } from "./error.handler.js";
 const { IpFilter } = pkg;
 
@@ -22,15 +23,18 @@ app.use(
   })
 );
 
-app.get("/", async (req, res) => {
+app.post("/create", async (req, res) => {
   try {
-    const user_id = req.query.user_id;
-    console.log(user_id);
-    const response = await retrieveRequest({ user_id: user_id });
-    return res.json(response);
-  } catch (error) {
-    console.error("Error in request route", error);
-    return res.status(500).send({ error: error });
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).send({ error: "Missing user id" });
+    }
+
+    const result = await createRequestManager(id);
+    return res.status(201).json({ id: result });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: err });
   }
 });
 
@@ -77,6 +81,18 @@ app.get("/availableAPI", async (req, res) => {
     return res.json(response);
   } catch (error) {
     console.error("Error in availableAPI route", error);
+    return res.status(500).send({ error: error });
+  }
+});
+
+app.get("/", async (req, res) => {
+  try {
+    const user_id = req.query.user_id;
+    console.log(user_id);
+    const response = await retrieveRequest({ user_id: user_id });
+    return res.json(response);
+  } catch (error) {
+    console.error("Error in request route", error);
     return res.status(500).send({ error: error });
   }
 });
