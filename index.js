@@ -6,6 +6,7 @@ import retrieveTicketStatus from "./database/RequestQuantity.js";
 import retrieveRequest from "./database/RetrieveRequest.js";
 import { createRequestManager } from "./database/createRequestManager.js";
 import { errorHandler } from "./error.handler.js";
+import retrieveAllRequest from "./database/retrieveAllRequests.js";
 const { IpFilter } = pkg;
 
 const port = process.env.PORT || 3000;
@@ -75,6 +76,16 @@ app.get("/availableAPI", async (req, res) => {
     return res.json(response);
   } catch (error) {
     console.error("Error in availableAPI route", error);
+    return res.status(500).send({ error: error });
+  }
+});
+
+app.get("/all", async (_req, res) => {
+  try {
+    const response = await retrieveAllRequest();
+    return res.json(response);
+  } catch (error) {
+    console.error("Error in request route", error);
     return res.status(500).send({ error: error });
   }
 });
