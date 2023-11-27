@@ -1,7 +1,5 @@
-import cors from "cors";
 import express from "express";
 import pkg from "express-ipfilter";
-import { GET, POST } from "./constants.js";
 import addRequest from "./database/AddRequest.js";
 import availableAPIrequest from "./database/AvailableAPI.js";
 import retrieveTicketStatus from "./database/RequestQuantity.js";
@@ -16,12 +14,6 @@ const app = express();
 app.use(IpFilter([process.env.WHITELIST_IP], { mode: "allow" }));
 
 app.use(express.json());
-app.use(
-  cors({
-    methods: POST,
-    GET,
-  })
-);
 
 app.post("/create", async (req, res) => {
   try {
