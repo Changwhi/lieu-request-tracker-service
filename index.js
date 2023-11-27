@@ -30,6 +30,10 @@ app.post("/create", async (req, res) => {
   }
 });
 
+app.put("/activate", async (req, res) => {
+  return;
+});
+
 app.post("/insert", async (req, res) => {
   try {
     const input = req.body.input;
@@ -84,6 +88,10 @@ app.get("/", async (req, res) => {
     console.error("Error in request route", error);
     return res.status(500).send({ error: error });
   }
+});
+
+app.use("*", (_req, res) => {
+  return res.status(404).send();
 });
 
 app.use(errorHandler);
