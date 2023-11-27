@@ -2,14 +2,13 @@ import mySqlDatabase from "../databaseConnectionSQL.js";
 
 export async function addRequest(data) {
   let preSQL = `
-      insert into request (input, output, user_id, createdAt)
-      values (:input, :output, :user_id, :createdAt)
+      insert into request (input, output, user_id)
+      values (:input, :output, :user_id)
 `;
   let params = {
     input: data.input,
     output: data.output,
     user_id: data.user_id,
-    createdAt: data.createdAt,
   };
 
   try {

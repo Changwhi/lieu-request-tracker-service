@@ -32,7 +32,6 @@ app.post("/create", async (req, res) => {
 
 app.post("/insert", async (req, res) => {
   try {
-    const createdAt = req.body.createdAt;
     const input = req.body.input;
     const output = req.body.output;
     const user_id = req.body.user_id;
@@ -41,7 +40,6 @@ app.post("/insert", async (req, res) => {
       input: input,
       output: output,
       user_id: user_id,
-      createdAt: createdAt,
     });
     if (response) {
       res.json({ Success: "Your request has been stored in our database" });
@@ -80,7 +78,6 @@ app.get("/availableAPI", async (req, res) => {
 app.get("/", async (req, res) => {
   try {
     const user_id = req.query.user_id;
-    console.log(user_id);
     const response = await retrieveRequest({ user_id: user_id });
     return res.json(response);
   } catch (error) {
