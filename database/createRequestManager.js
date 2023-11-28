@@ -3,7 +3,7 @@ import mySqlDatabase from "../databaseConnectionSQL.js";
 export const createRequestManager = async (userId) => {
   const query = `
     INSERT INTO request_manager (user_id, activated)
-    VALUES (:user_id, 0)
+    VALUES (:user_id, 1)
   `;
 
   const params = { user_id: userId };

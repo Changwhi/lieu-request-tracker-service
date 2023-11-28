@@ -10,9 +10,6 @@ async function retrieveAllRequest() {
 
   try {
     const response = await mySqlDatabase.query(preSQL);
-    console.log(
-      "Successfully retrieved request :" + JSON.stringify(response[0])
-    );
     return response[0];
   } catch (err) {
     console.log("Error in retrieve request function :" + err);

@@ -2,9 +2,13 @@ import express from "express";
 import pkg from "express-ipfilter";
 import addRequest from "./database/AddRequest.js";
 import availableAPIrequest from "./database/AvailableAPI.js";
-import retrieveTicketStatus from "./database/RequestQuantity.js";
-import retrieveRequest from "./database/RetrieveRequest.js";
+import retrieveUsers, { retrieveUserById } from "./database/retrieveUsers.js";
+import retrieveRequest from "./database/retrieveUsers.js";
 import { createRequestManager } from "./database/createRequestManager.js";
+import {
+  logRequestEndpoint,
+  retrieveEndpointLog,
+} from "./database/logEndpoint.js";
 import { errorHandler } from "./error.handler.js";
 import retrieveAllRequest from "./database/retrieveAllRequests.js";
 const { IpFilter } = pkg;
@@ -20,14 +24,14 @@ app.post("/create", async (req, res) => {
   try {
     const { id } = req.body;
     if (!id) {
-      return res.status(400).send({ error: "Missing user id" });
+      return res.status(400).send({ message: "Missing user id" });
     }
 
     const result = await createRequestManager(id);
     return res.status(201).json({ id: result });
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: err });
+    return res.status(500).json({ message: err });
   }
 });
 
@@ -58,10 +62,34 @@ app.post("/insert", async (req, res) => {
   }
 });
 
-app.get("/ticketStatus", async (req, res) => {
+app.post("/log", async (req, res) => {
+  try {
+    const { path, method } = req.body;
+    const success = await logRequestEndpoint(path, method);
+    if (!success) {
+      return res.status(500).json({ error: "Failed to log request" });
+    }
+    return res.status(201).json({ message: "request logged" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/log", async (_req, res) => {
+  try {
+    const response = await retrieveEndpointLog();
+    return res.json(response);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/users", async (req, res) => {
   try {
     const user_id = req.query.user_id;
-    const response = await retrieveTicketStatus({ user_id: user_id });
+    const response = await retrieveUsers({ user_id: user_id });
     return res.json(response);
   } catch (error) {
     console.error("Error in request route", error);
@@ -93,7 +121,7 @@ app.get("/all", async (_req, res) => {
 app.get("/", async (req, res) => {
   try {
     const user_id = req.query.user_id;
-    const response = await retrieveRequest({ user_id: user_id });
+    const response = await retrieveUserById(user_id);
     return res.json(response);
   } catch (error) {
     console.error("Error in request route", error);

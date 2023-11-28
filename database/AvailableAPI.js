@@ -11,7 +11,8 @@ async function availableAPIrequest(data) {
   try {
     const response = await mySqlDatabase.query(preSQL, params);
     console.log(
-      "Successfully availableAPIrequest request :" + JSON.stringify(response[0])
+      "Successfully availableAPIrequest request :" +
+        JSON.stringify(response[0][0]),
     );
     const result = response[0][0];
     return { activated: result.activated === 1 ?? false };
