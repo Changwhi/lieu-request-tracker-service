@@ -11,6 +11,7 @@ import {
 } from "./database/logEndpoint.js";
 import { errorHandler } from "./error.handler.js";
 import retrieveAllRequest from "./database/retrieveAllRequests.js";
+import { deleteRequest } from "./database/deleteRequest.js";
 const { IpFilter } = pkg;
 
 const port = process.env.PORT || 3000;
@@ -33,10 +34,6 @@ app.post("/create", async (req, res) => {
     console.log(err);
     return res.status(500).json({ message: err });
   }
-});
-
-app.put("/activate", async (req, res) => {
-  return;
 });
 
 app.post("/insert", async (req, res) => {
@@ -126,6 +123,29 @@ app.get("/", async (req, res) => {
   } catch (error) {
     console.error("Error in request route", error);
     return res.status(500).send({ error: error });
+  }
+});
+
+app.delete("/", async (req, res) => {
+  try {
+    const requestId = req.query.id;
+    const userId = req.query.user_id;
+
+    if (!requestId || !userId) {
+      return res.status(400).send({ message: "Missing request id or user id" });
+    }
+    const response = await deleteRequest({
+      requestId: requestId,
+      userId: userId,
+    });
+
+    if (response) {
+      return res.status(204).json();
+    }
+    return res.status(400).json({ error: "Failed to delete request" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: err.message });
   }
 });
 
